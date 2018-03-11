@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">GhostLite</string>
+    <string name="access_token">pk.eyJ1Ijoid2FzYXRvcmlwcm8iLCJhIjoiY2o4Y3JteWRxMGVzMjMzcDV4OHZlMWZxNSJ9.qCXKK1E2Bs4cYlq_v5eRMw</string>
 </resources>

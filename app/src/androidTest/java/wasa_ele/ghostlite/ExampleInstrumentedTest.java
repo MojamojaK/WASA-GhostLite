@@ -1,4 +1,4 @@
-package wasa_ele.myapplication;
+package wasa_ele.ghostlite;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

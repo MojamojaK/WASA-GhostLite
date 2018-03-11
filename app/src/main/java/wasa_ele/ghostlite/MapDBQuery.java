@@ -1,4 +1,4 @@
-package wasa_ele.myapplication;
+package wasa_ele.ghostlite;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

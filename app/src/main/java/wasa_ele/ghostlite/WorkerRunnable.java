@@ -1,4 +1,4 @@
-package wasa_ele.myapplication;
+package wasa_ele.ghostlite;
 
 import java.io.BufferedReader;
 import java.io.File;

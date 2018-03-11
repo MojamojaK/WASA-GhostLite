@@ -1,4 +1,4 @@
-package wasa_ele.myapplication;
+package wasa_ele.ghostlite;
 
 import org.junit.Test;
 

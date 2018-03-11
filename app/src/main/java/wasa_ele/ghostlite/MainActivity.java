@@ -1,17 +1,16 @@
-package wasa_ele.myapplication;
+package wasa_ele.ghostlite;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
-
-    private MapView mapView;
+    private DrawMapView drawMapView;
+    private static final String TAG = MainActivity.class.getSimpleName();
     MapServer server = null;
 
     private void createServer() {
@@ -32,14 +31,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         createServer();
-        Mapbox.getInstance(this, "MY-ACCESS-TOKEN");
+        Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.activity_main);
-        mapView = (MapView) findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
+        drawMapView = (DrawMapView) findViewById(R.id.drawMapView);
+        drawMapView.onCreate(savedInstanceState);
+        drawMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
-                mapView.setStyleUrl("asset://mapStyle.json");
+                drawMapView.setStyleUrl("asset://mapStyle.json");
             }
         });
     }
@@ -47,44 +46,44 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        mapView.onStart();
+        drawMapView.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+        drawMapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+        drawMapView.onPause();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mapView.onStop();
+        drawMapView.onStop();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
         System.gc();
-        mapView.onLowMemory();
+        drawMapView.onLowMemory();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         closeServer();
-        mapView.onDestroy();
+        drawMapView.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+        drawMapView.onSaveInstanceState(outState);
     }
 }
