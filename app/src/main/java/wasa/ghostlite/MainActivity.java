@@ -1,4 +1,4 @@
-package wasa_ele.ghostlite;
+package wasa.ghostlite;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ public class MainActivity extends Activity {
     private DrawMapView drawMapView;
     private static final String TAG = MainActivity.class.getSimpleName();
     MapServer server = null;
+    ArduinoCommunication communication;
 
     private void createServer() {
         if (server == null) {
@@ -31,6 +32,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         createServer();
+
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.activity_main);
         drawMapView = (DrawMapView) findViewById(R.id.drawMapView);
@@ -41,6 +43,8 @@ public class MainActivity extends Activity {
                 drawMapView.setStyleUrl("asset://mapStyle.json");
             }
         });
+
+        this.communication = new ArduinoCommunication(this, this.drawMapView);
     }
 
     @Override
@@ -52,18 +56,23 @@ public class MainActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+        createServer();
+        this.communication.resume();
         drawMapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        closeServer();
+        this.communication.close();
         drawMapView.onPause();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        closeServer();
         drawMapView.onStop();
     }
 
@@ -77,6 +86,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        this.communication.destroy();
         closeServer();
         drawMapView.onDestroy();
     }

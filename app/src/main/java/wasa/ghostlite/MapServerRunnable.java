@@ -1,4 +1,4 @@
-package wasa_ele.ghostlite;
+package wasa.ghostlite;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
 
  */
-public class WorkerRunnable implements Runnable{
+public class MapServerRunnable implements Runnable{
 
     private static String requestPath;
 
@@ -38,7 +38,7 @@ public class WorkerRunnable implements Runnable{
     private Socket clientSocket = null;
     private String documentRoot = null;
 
-    public WorkerRunnable(Socket clientSocket, String serverText, String documentRoot) {
+    public MapServerRunnable(Socket clientSocket, String serverText, String documentRoot) {
         this.clientSocket = clientSocket;
         this.documentRoot = documentRoot;
     }
@@ -54,7 +54,7 @@ public class WorkerRunnable implements Runnable{
         // System.out.println("END worker Thread: " + Thread.currentThread().getId());
     }
 
-    private static void outputRequest(Socket client) throws IOException {
+    private synchronized static void outputRequest(Socket client) throws IOException {
         //System.out.println("//------------------------------------------");
 
         BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -72,7 +72,7 @@ public class WorkerRunnable implements Runnable{
         }
     }
 
-    private static void outputResponse(Socket client, String documentRoot) throws IOException {
+    private synchronized static void outputResponse(Socket client, String documentRoot) throws IOException {
         PrintStream ps = new PrintStream(client.getOutputStream());
         try {
             String[] strArray = requestPath.split("/");
@@ -81,13 +81,13 @@ public class WorkerRunnable implements Runnable{
             String x = strArray[3];
             String y = strArray[4].substring(0, strArray[4].length() - 4);
 
-            int intY = Integer.valueOf(y);
-            int intZ = Integer.valueOf(z);
+            long intY = Long.parseLong(y);
+            long intZ = Long.parseLong(z);
 
             intY = (1 << intZ) - 1 - intY;  // y軸が南北で反転されているっぽいのでy軸を反転する。
-            y = Integer.toString(intY);     // y軸が南北で反転されているっぽいのでy軸を反転する。
+            y = Long.toString(intY);     // y軸が南北で反転されているっぽいのでy軸を反転する。
 
-            // System.out.println(db_name + "/" + z + "/" + x + "/" + y);
+            System.out.println(db_name + "/" + z + "/" + x + "/" + y);
 
             final File sdCardDirectory = new File(documentRoot);
             final File sqliteFile = new File(sdCardDirectory, db_name);

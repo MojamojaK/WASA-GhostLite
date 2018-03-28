@@ -1,4 +1,4 @@
-package wasa_ele.ghostlite;
+package wasa.ghostlite;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,7 +34,7 @@ public class MapDBQuery {
             byte[] tmpByteArray = c.getBlob(c.getColumnIndex("tile_data"));
             int bodyLength = tmpByteArray.length;
             // System.out.println("bodyLength: " + Integer.toString(bodyLength));
-            ps.println("Content-Length: " + bodyLength);
+            ps.println("Content-Length: " + Integer.toString(bodyLength));
             ps.println("");
             ps.write(tmpByteArray, 0, bodyLength);
             ps.flush();

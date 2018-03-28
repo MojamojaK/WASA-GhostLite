@@ -1,4 +1,6 @@
-package wasa_ele.ghostlite;
+// ほぼ http://blog.srichakram.in/2015/09/setting-up-android-studio-to-work-with.html のコピペ
+
+package wasa.ghostlite;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -27,11 +29,11 @@ public class MapServer implements Runnable{
             Socket clientSocket = null;
             try {
                 clientSocket = this.serverSocket.accept();
+                new Thread(new MapServerRunnable(clientSocket, "Multithreaded Server", this.documentRoot)).start();
             } catch (IOException e) {
-                if (isStopped()) return;
+                if (isStopped()) break;
                 throw new RuntimeException("Error accepting client connection", e);
             }
-            new Thread(new WorkerRunnable(clientSocket, "Multithreaded Server", this.documentRoot)).start();
         }
         System.out.println("END locker Thread: " + Thread.currentThread().getId());
     }
@@ -47,8 +49,10 @@ public class MapServer implements Runnable{
 
     private void openServerSocket() {
         try {
+            this.isStopped = false;
             this.serverSocket = new ServerSocket(this.port);
         } catch (IOException e) {
+            this.isStopped = true;
             throw new RuntimeException("Cannot open port 8080", e);
         }
     }

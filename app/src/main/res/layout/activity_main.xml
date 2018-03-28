@@ -5,14 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="wasa_ele.ghostlite.MainActivity">
+    tools:context="wasa.ghostlite.MainActivity">
 
-    <wasa_ele.ghostlite.DrawMapView
+    <wasa.ghostlite.DrawMapView
         android:id="@+id/drawMapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         mapbox:mapbox_cameraTargetLat="35.975278"
         mapbox:mapbox_cameraTargetLng="139.523889"
-        mapbox:mapbox_cameraZoom="14" />
+        mapbox:mapbox_cameraZoom="14" >
+    </wasa.ghostlite.DrawMapView>
 
 </RelativeLayout>

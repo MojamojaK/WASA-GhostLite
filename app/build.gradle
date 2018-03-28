@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "wasa_ele.myapplication"
+        applicationId "wasa.myapplication"
         minSdkVersion 17
         targetSdkVersion 26
         versionCode 1
