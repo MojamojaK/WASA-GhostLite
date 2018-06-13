@@ -10,16 +10,71 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 
-import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.maps.*;
+import com.mapbox.mapboxsdk.style.layers.*;
+import com.mapbox.mapboxsdk.style.sources.*;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 public class DrawMapView extends MapView {
     public int cadence = 0;
     public float air = 0.0f;
-    public float ground = 0.0f;
     public float altitude = 0.0f;
+
     public float yaw = 0.0f;
+    public float yaw4log = 0.0f; // ログ用のyaw
     public float pitch = 0.0f;
     public float roll = 0.0f;
+    public float accelX = 0.0f;
+    public float accelY = 0.0f;
+    public float accelZ = 0.0f;
+    public byte calibAccel = 0;
+    public byte calibGyro = 0;
+    public byte calibMag = 0;
+    public byte calibSystem = 0;
+
+    public float longitude = 139.523889f;
+    public float latitude = 35.975278f;
+    public float ground = 0.0f;
+    public int satellites = 0;
+    public float hdop = 0;
+    public float lng_error = 0;
+    public float lat_error = 0;
+    public float gps_altitude = 0;
+    public float gps_course = 0;
+
+    public int rud_flag = 0;
+    public int rud_torque_mode = 0;
+    public float rud_pos = 0;
+    public int rud_load = 0;
+    public int rud_temp = 0;
+    public float rud_volt = 0;
+    public int ele_flag = 0;
+    public int ele_torque_mode = 0;
+    public float ele_pos = 0;
+    public int ele_load = 0;
+    public int ele_temp = 0;
+    public float ele_volt = 0;
+
+    public float temperature = 0;
+    public int humidity = 0;
+    public float pressure = 0;
+
+    public static final String[] logKeys = {"time", "altitude", "airSpeed", "groundSpeed", "cadence", "rudder", "elevator",
+            "yaw", "pitch", "roll", "accelX", "accelY", "accelZ", "calSystem", "calAccel", "calGyro", "calMag",
+            "longitude", "latitude", "satellites", "hdop", "longitudeError", "latitudeError", "gpsAltitude", "gpsCourse",
+            "rudderTemp", "rudderLoad", "rudderVolt", "elevatorTemp", "elevatorLoad", "elevatorVolt",
+            "temperature", "humidity", "airPressure"};
+
+    private MapboxMap mapboxMap = null;
     private Paint mPaint = new Paint();
     private Path mPath1 = new Path();
     private Path mPath2 = new Path();
@@ -27,6 +82,9 @@ public class DrawMapView extends MapView {
     private static final RectF rectangle = new RectF(-400,-400,400,400);
     private int alt_colors[] = new int[10];
     private int spd_colors[] = new int[10];
+
+    private File log_file;
+    private FileOutputStream log_file_stream;
 
     public DrawMapView(Context context) {
         super(context);
@@ -41,6 +99,81 @@ public class DrawMapView extends MapView {
     public DrawMapView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initColors();
+    }
+
+    public void setMapboxMap(MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+    }
+
+    public void initLogFile() {
+        System.out.println("Initiating Log File");
+        //Android4.4以上はこの方法でSDカードへの保存は不可
+        String filePath = "mnt/external_sd/sensor_tori_2018.csv";
+        log_file = new File(filePath);
+        System.out.println(!log_file.exists() && !log_file.isDirectory());
+        if (true) { // ファイルが存在しない場合
+            try {
+                log_file_stream = new FileOutputStream(log_file, true);
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(log_file_stream, "UTF-8")));
+                pw.print("ghostlog\n");
+                for (int i = 0; i < logKeys.length - 1; i++) {
+                    pw.print(logKeys[i]);
+                    pw.print(',');
+                }
+                pw.print(logKeys[logKeys.length - 1]);
+                pw.print('\n');
+                pw.flush();
+                pw.close();
+                System.out.println("Initiated Log File");
+            } catch (FileNotFoundException e) { }
+            catch (UnsupportedEncodingException e) { }
+        }
+        logData(); // 開始時間をログするためにログ
+    }
+
+    public void logData () {
+        try {
+            log_file_stream = new FileOutputStream(log_file, true);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(log_file_stream, "UTF-8")));
+            pw.print(System.currentTimeMillis()); pw.print(',');
+            pw.print(this.altitude);        pw.print(',');
+            pw.print(this.air);             pw.print(',');
+            pw.print(this.ground);          pw.print(',');
+            pw.print(this.cadence);         pw.print(',');
+            pw.print(this.rud_pos);         pw.print(',');
+            pw.print(this.ele_pos);         pw.print(',');
+            pw.print(this.yaw4log);         pw.print(',');
+            pw.print(this.pitch);           pw.print(',');
+            pw.print(this.roll);            pw.print(',');
+            pw.print(this.accelX);          pw.print(',');
+            pw.print(this.accelY);          pw.print(',');
+            pw.print(this.accelZ);          pw.print(',');
+            pw.print(this.calibSystem);     pw.print(',');
+            pw.print(this.calibAccel);      pw.print(',');
+            pw.print(this.calibGyro);       pw.print(',');
+            pw.print(this.calibMag);        pw.print(',');
+            pw.print(this.longitude);       pw.print(',');
+            pw.print(this.latitude);        pw.print(',');
+            pw.print(this.satellites);      pw.print(',');
+            pw.print(this.hdop);            pw.print(',');
+            pw.print(this.lng_error);       pw.print(',');
+            pw.print(this.lat_error);       pw.print(',');
+            pw.print(this.gps_altitude);    pw.print(',');
+            pw.print(this.gps_course);      pw.print(',');
+            pw.print(this.rud_temp);        pw.print(',');
+            pw.print(this.rud_load);        pw.print(',');
+            pw.print(this.rud_volt);        pw.print(',');
+            pw.print(this.ele_temp);        pw.print(',');
+            pw.print(this.ele_load);        pw.print(',');
+            pw.print(this.ele_volt);        pw.print(',');
+            pw.print(this.temperature);     pw.print(',');
+            pw.print(this.humidity);        pw.print(',');
+            pw.print(this.pressure);        pw.print('\n');
+            pw.flush();
+            pw.close();
+        } catch (IOException e) {
+            System.err.println(e);
+        }
     }
 
     private void initColors() {
@@ -68,11 +201,29 @@ public class DrawMapView extends MapView {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
+        updateMap();
         super.dispatchDraw(canvas);
         drawOrientation(canvas);
         drawCadence(canvas);
         drawAltitude(canvas);
         drawSpeed(canvas);
+    }
+
+    public void updateMap () {
+        if (this.mapboxMap != null) {
+            GeoJsonSource planeSource = ((GeoJsonSource) this.mapboxMap.getSource("planeSource"));
+            if (planeSource != null) {
+                planeSource.setGeoJson(
+                        Point.fromLngLat(this.longitude, this.latitude)
+                );
+            }
+            Layer planeLayer = this.mapboxMap.getLayer("planeLayer");
+            if (planeLayer != null) {
+                planeLayer.setProperties(
+                        PropertyFactory.iconRotate(this.yaw)
+                );
+            }
+        }
     }
 
     private void drawOrientation(Canvas canvas) {
@@ -355,6 +506,6 @@ public class DrawMapView extends MapView {
     }
 
     public void updateData() {
-        invalidate();
+        invalidate(); // 現在の画面の状態を無効にする->強制的に再描写
     }
 }
