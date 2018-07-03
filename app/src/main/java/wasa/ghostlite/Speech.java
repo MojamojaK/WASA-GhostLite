@@ -9,7 +9,7 @@ public class Speech implements Runnable {
 
     boolean enabled = false;
     DrawMapView drawMapView;
-    TextToSpeech tts;
+    private TextToSpeech tts;
 
     Speech(MainActivity mainActivity, DrawMapView drawMapView) {
         Speech t = this;
@@ -42,7 +42,9 @@ public class Speech implements Runnable {
                     text = "Error";
                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                 } else {
-                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    if (this.drawMapView.cadence != 0) {
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    }
                 }
             } catch (InterruptedException e) {}
         }
