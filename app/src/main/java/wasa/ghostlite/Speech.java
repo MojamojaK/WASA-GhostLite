@@ -42,7 +42,7 @@ public class Speech implements Runnable {
                     text = "Error";
                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                 } else {
-                    if (this.drawMapView.cadence != 0) {
+                    if (this.drawMapView.cadence > 70) { // 70未満はうざいというフィードバックをもらった
                         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                     }
                 }
