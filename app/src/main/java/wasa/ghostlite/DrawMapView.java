@@ -131,6 +131,7 @@ public class DrawMapView extends MapView {
         logData(); // 開始時間をログするためにログ
     }
 
+    // TODO: データログ機能は未完成です。(鳥コン出場の場合は必須)
     public void logData () {
         try {
             log_file_stream = new FileOutputStream(log_file, true);
